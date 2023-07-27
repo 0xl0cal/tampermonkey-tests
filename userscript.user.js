@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoDebank
 // @namespace    http://t.me/lqcrypto
-// @version      1.2
+// @version      1.1
 // @description  Automates Debank activities.
 // @author       local
 // @match        https://debank.com/*
@@ -23,6 +23,9 @@
   function toggleAutoUnfollower(event) {
     enableAutoUnfollower = event.target.checked;
     localStorage.setItem('enableAutoUnfollower', enableAutoUnfollower);
+
+    // Update the UI with the current value of totalUnfollows
+    document.getElementById('totalUnfollows').textContent = totalUnfollows;
   }
 
   function clickButtonByClassName(className) {
@@ -84,7 +87,7 @@
 
       // Click "Follow" or "Followed" button and wait for a short delay
       clickButtonByClassName('FollowButton_followBtn__DtOgj');
-      await wait(500);
+      await wait(1500);
 
       // Wait for "Follow" or "Followed" buttons to appear
       await waitForStateChange(document.body, 'Following');
@@ -100,7 +103,6 @@
       } else {
         // Click "Join the Lucky Draw" button
         clickButtonByClassName('JoinDrawModal_submitBtn__RJXvp');
-        totalLuckyDrawJoined++
       }
 
       // Scroll to the next Lucky Draw
@@ -108,7 +110,8 @@
 
       // Wait for the next cycle
       await wait(delayBetweenActions);
-      // Update totalLuckyDrawJoined in the UI
+
+      totalLuckyDrawJoined++
       document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined;
     }
   }
@@ -143,11 +146,13 @@
     enableAutoJoin = event.target.checked;
     localStorage.setItem('enableAutoJoin', enableAutoJoin);
 
+    // Update the UI with the current value of totalLuckyDrawJoined
+    document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined;
+
     if (enableAutoJoin && isRunning) {
       clickButtons();
     }
   }
-
 
   function setDelay(event) {
     delayBetweenActions = event.target.value;
@@ -193,8 +198,10 @@
       <hr style="margin: 10px 0;">
       <div>
         <strong>Stats:</strong>
-        <div>Total unfollows: <span id="totalUnfollows">0</span></div>
-        <div>Total Lucky Draw joined: <span id="totalLuckyDrawJoined">0</span></div>
+        <div>Total unfollows: <span id="totalUnfollows">${totalUnfollows}</span></div>
+        <div>Total Lucky Draw joined: <span id="totalLuckyDrawJoined">${totalLuckyDrawJoined}</span></div>
+        <div>Version: v1.2</div>
+        <div>t.me/lqcrypto</div>
       </div>
     </div>
 `;
@@ -274,8 +281,6 @@
   document.getElementById('totalUnfollows').textContent = totalUnfollows;
   document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined;
 
-  document.getElementById('autoJoinToggle').checked = enableAutoJoin;
-  document.getElementById('delayInput').value = delayBetweenActions;
   document.getElementById('autoJoinToggle').checked = enableAutoJoin;
   document.getElementById('delayInput').value = delayBetweenActions;
 })();
