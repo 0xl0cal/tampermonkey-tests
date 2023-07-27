@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoDebank
 // @namespace    http://t.me/lqcrypto
-// @version      1.1
+// @version      1.3
 // @description  Automates Debank activities.
 // @author       local
 // @match        https://debank.com/*
@@ -58,7 +58,7 @@
       if (button.textContent === 'Following') { // Check if the button text is 'Following'
         button.click();
         await wait(delayBetweenActions);
-        totalUnfollows++;
+        document.getElementById('totalUnfollows').textContent = totalUnfollows++;
       }
     }
     const nextPageButton = document.querySelector('.ant-pagination-next a');
@@ -68,7 +68,6 @@
       await autoUnfollow();
     }
     // Update totalUnfollows in the UI
-    document.getElementById('totalUnfollows').textContent = totalUnfollows;
   }
 
   async function clickButtons() {
@@ -85,6 +84,7 @@
 
       await wait(1000); // Additional delay before clicking
       joinTheDrawButton.click();
+      document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined++;
 
       // Click "Follow" or "Followed" button and wait for a short delay
       clickButtonByClassName('FollowButton_followBtn__DtOgj');
@@ -96,6 +96,7 @@
       // Check if "Not qualified" message is present
       const notQualifiedMessage = document.querySelector('div.JoinDrawModal_inValidTag__3Sfee');
       if (notQualifiedMessage && notQualifiedMessage.textContent === 'Not qualified') {
+        document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined--;
         // Close the Lucky Draw window
         const closeButton = document.querySelector('img.CommonModal_closeModalButton__1swng');
         if (closeButton) {
@@ -111,9 +112,6 @@
 
       // Wait for the next cycle
       await wait(delayBetweenActions);
-
-      totalLuckyDrawJoined++
-      document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined;
     }
   }
 
@@ -148,7 +146,6 @@
     localStorage.setItem('enableAutoJoin', enableAutoJoin);
 
     // Update the UI with the current value of totalLuckyDrawJoined
-    document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined;
 
     if (enableAutoJoin && isRunning) {
       clickButtons();
@@ -177,6 +174,7 @@
           <button style="padding: 8px 16px; background: #4caf50; color: #fff; border: none; border-radius: 5px; cursor: pointer;" id="startButton">Start</button>
           <button style="padding: 8px 16px; background: #f44336; color: #fff; border: none; border-radius: 5px; cursor: pointer;" id="stopButton">Stop</button>
         </div>
+      </div>
         <div style="display: flex; align-items: center;">
           <a style="margin-right: 10px;">Enable Auto Join</a>
           <label class="switch">
@@ -184,7 +182,9 @@
             <span class="slider round"></span>
           </label>
         </div>
-      </div>
+        <div>
+          <br>
+        </div>
       <div style="display: flex; align-items: center;">
         <a style="margin-right: 10px;">Auto Unfollower</a>
         <label class="switch">
@@ -201,8 +201,8 @@
         <strong>Stats:</strong>
         <div>Total unfollows: <span id="totalUnfollows">${totalUnfollows}</span></div>
         <div>Total Lucky Draw joined: <span id="totalLuckyDrawJoined">${totalLuckyDrawJoined}</span></div>
-        <div>Version: v1.2</div>
-        <div>t.me/lqcrypto</div>
+        <div>Version: v1.3</div>
+        <a href="https://t.me/lqcrypto">t.me/lqcrypto (click)</div>
       </div>
     </div>
 `;
