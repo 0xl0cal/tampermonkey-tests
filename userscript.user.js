@@ -83,6 +83,7 @@
         }
       } while (!joinTheDrawButton);
 
+      await wait(1000); // Additional delay before clicking
       joinTheDrawButton.click();
 
       // Click "Follow" or "Followed" button and wait for a short delay
