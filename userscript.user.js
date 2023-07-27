@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AutoDebank
 // @namespace    http://t.me/lqcrypto
-// @version      1.1
+// @version      1.2
 // @description  Automates Debank activities.
 // @author       local
 // @match        https://debank.com/*
@@ -13,6 +13,12 @@
   let enableAutoJoin = true;
   let delayBetweenActions = 1000;
   let enableAutoUnfollower = false;
+  let totalUnfollows = 0;
+  let totalLuckyDrawJoined = 0;
+
+  function getTotalUnfollows() {
+    return totalUnfollows;
+  }
 
   function toggleAutoUnfollower(event) {
     enableAutoUnfollower = event.target.checked;
@@ -46,9 +52,20 @@
   async function autoUnfollow() {
     const followingButtons = document.querySelectorAll('.FollowButton_follwing__2itpB');
     for (const button of followingButtons) {
-      button.click();
-      await wait(delayBetweenActions);
+      if (button.textContent === 'Following') { // Check if the button text is 'Following'
+        button.click();
+        await wait(delayBetweenActions);
+        totalUnfollows++;
+      }
     }
+    const nextPageButton = document.querySelector('.ant-pagination-next a');
+    if (nextPageButton) {
+      nextPageButton.click();
+      await wait(2500); // Wait for the next page to load (adjust the delay as needed)
+      await autoUnfollow();
+    }
+    // Update totalUnfollows in the UI
+    document.getElementById('totalUnfollows').textContent = totalUnfollows;
   }
 
   async function clickButtons() {
@@ -83,6 +100,7 @@
       } else {
         // Click "Join the Lucky Draw" button
         clickButtonByClassName('JoinDrawModal_submitBtn__RJXvp');
+        totalLuckyDrawJoined++
       }
 
       // Scroll to the next Lucky Draw
@@ -90,8 +108,11 @@
 
       // Wait for the next cycle
       await wait(delayBetweenActions);
+      // Update totalLuckyDrawJoined in the UI
+      document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined;
     }
   }
+
 
   async function autoUnfollowerLoop() {
     while (isRunning) {
@@ -169,6 +190,12 @@
         <label style="font-size: 14px;">Delay between actions (ms):</label>
         <input type="number" min="500" value="${delayBetweenActions}" id="delayInput" style="margin-top: 5px;">
       </div>
+      <hr style="margin: 10px 0;">
+      <div>
+        <strong>Stats:</strong>
+        <div>Total unfollows: <span id="totalUnfollows">0</span></div>
+        <div>Total Lucky Draw joined: <span id="totalLuckyDrawJoined">0</span></div>
+      </div>
     </div>
 `;
 
@@ -243,7 +270,12 @@
   document.getElementById('autoJoinToggle').addEventListener('change', toggleAutoJoin);
   document.getElementById('delayInput').addEventListener('change', setDelay);
 
-  // Update toggle switch and input with initial values
+  // Update totalUnfollows and totalLuckyDrawJoined in the UI
+  document.getElementById('totalUnfollows').textContent = totalUnfollows;
+  document.getElementById('totalLuckyDrawJoined').textContent = totalLuckyDrawJoined;
+
+  document.getElementById('autoJoinToggle').checked = enableAutoJoin;
+  document.getElementById('delayInput').value = delayBetweenActions;
   document.getElementById('autoJoinToggle').checked = enableAutoJoin;
   document.getElementById('delayInput').value = delayBetweenActions;
 })();
